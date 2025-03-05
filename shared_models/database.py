@@ -1,9 +1,12 @@
 import datetime
+import uuid
+import uuid_utils
 from typing import Annotated
 from sqlalchemy import NullPool, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, mapped_column
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from app.config import settings
+from config import settings
 
 
 if settings.MODE == 'TEST':
@@ -23,7 +26,7 @@ async_session_maker = sessionmaker(engine_nullpool,
 class Base(DeclarativeBase):
     pass
 
-intpk = Annotated[int, mapped_column(primary_key=True)]
+intpk = Annotated[uuid.UUID, mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid_utils.uuid7)]
 str_not_null = Annotated[str, mapped_column(nullable=False)]
 str_null = Annotated[str, mapped_column(nullable=True)]
-created_at = Annotated[datetime.date, mapped_column(server_default=text("TIMEZONE('utc', now())"))]
+created_at = Annotated[datetime.datetime, mapped_column(server_default=text("TIMEZONE('utc', now())"))]
